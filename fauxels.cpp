@@ -5,7 +5,7 @@
 #endif
 
 #include "Arduino.h"
-#include "sketch/sketch.ino"
+#include "sketch/sketch_psy.ino"
 
 int main(int argc, char *argv[])
 {
