@@ -12,5 +12,5 @@ void loop()
        Serial.print("Got value:");
        int value = digitalRead(9);
        Serial.print(value);
-       delay(2000);
+       delay(1000);
 }
