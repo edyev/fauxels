@@ -14,6 +14,7 @@ SoftPixel::SoftPixel(uint16_t count, uint8_t pin, uint8_t mode)
 	//printf("[?] Pixel(%d, %d, %d)\n", count, pin, mode);
 
 	initialize_pixels(count); // TODO also initialize views to show overlap
+	
 }
 
 
@@ -23,20 +24,22 @@ void SoftPixel::begin(void)
 }
 
 
+
 void SoftPixel::show(void)
 {
-	//printf("[!] Pixel.show\n");
+	
 	show_pixels();
-
+        
 	for(int i = 0; i < pixel_count; i++)
 	{
 		uint8_t r,g,b;
-
+		
 		r = (uint8_t)(pixels[i] >> 16),
 		g = (uint8_t)(pixels[i] >>  8),
 		b = (uint8_t)(pixels[i] >>  0);
-
+   		
 		render_pixel(i, r, g, b); // Implement in sdl/gl/canvas
+		
 	}
 }
 

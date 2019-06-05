@@ -4,6 +4,7 @@ extern "C"
 {
 #include <SDL.h>
 #include <SDL2_gfxPrimitives.h>
+#include <math.h>
 }
 
 const int SCREEN_WIDTH  = 1280;
@@ -18,7 +19,7 @@ uint16_t fauxel_leds[256]       = {0};
 uint16_t fauxel_view_size [256] = {0};
 uint16_t fauxel_view_start[256] = {0};
 uint8_t fauxel_view_count = 0;
-
+uint32_t n_leds = 0;
 extern "C" {
 	void register_view(uint16_t start, uint16_t length)
 	{
@@ -27,7 +28,7 @@ extern "C" {
 		fauxel_view_count++;
 		fauxel_view_size [fauxel_view_count] = length;
 		fauxel_view_start[fauxel_view_count] = start;
-
+		printf("In register view !!!\n");
 		for(int i = start; i < start + length; i++)
 		{
 			if(fauxel_leds[i] == 0)
@@ -39,21 +40,23 @@ extern "C" {
 
 	void render_pixel(uint16_t index, uint8_t r, uint8_t g, uint8_t b)
 	{
-		//printf("[0] render_pixel(%u, {%u,%u,%u})\n", index, r, g, b);
+		
+		
+		
+		uint16_t x_center = SCREEN_WIDTH  / 2;
+		uint16_t y_center = SCREEN_HEIGHT / 2;
 
-		uint16_t view = fauxel_leds[index];
-		uint16_t view_led_count = fauxel_view_size[view];
-		uint16_t view_led_position = index - fauxel_view_start[view];
-
-		uint16_t center_x = (SCREEN_WIDTH / fauxel_view_count) * view - (SCREEN_WIDTH / fauxel_view_count / 2) ;
-		uint16_t center_y = SCREEN_HEIGHT / 2;
-		uint16_t x = sin((360.0/view_led_count * view_led_position) * (M_PI/180)) * (SCREEN_WIDTH / fauxel_view_count / 2 - 25) + center_x;
-		uint16_t y = cos((360.0/view_led_count * view_led_position) * (M_PI/180)) * (SCREEN_WIDTH / fauxel_view_count / 2 - 25) + center_y;
+		//printf("Rendering index:%u", index);
+		
+		// x_angle = index / n_leds * 360; x = cos(x_angle * M_PI / 360)
+		uint16_t x = x_center + 150.0 * cos(index *1.0f / n_leds * M_PI * 2.0);
+		uint16_t y = y_center + 150.0 * sin(index * 1.0f / n_leds * M_PI * 2.0);
+		//printf("{x,y} = {%f, %f}\n", index *1.0f / n_leds * 360.0, sin(index * 1.0f / n_leds * 360.0));
 		// Could derive from # of views and led count to squeeze into space
-		uint16_t radius = 20;
-
+		uint16_t radius = 12;
+		
 		filledCircleRGBA( renderer, x, y, radius, r, g, b, 0xFF );
-
+		//printf("Done rendering\n");
 		// Alpha might be useful for simulating low color on leds (since its not black).
 		// Could also draw overlapping alpha shapes since leds are individual colors.
 		//SDL_SetRenderDrawColor( renderer, r, g, b, 0xFF );
@@ -94,5 +97,6 @@ extern "C" {
 		SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 		SDL_RenderClear( renderer );
 		SDL_RenderPresent( renderer );
+		n_leds = count;
 	}
 }
